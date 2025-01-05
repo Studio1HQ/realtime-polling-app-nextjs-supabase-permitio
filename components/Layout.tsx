@@ -18,7 +18,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div
-      className={`${geistSans.variable} ${geistMono.variable} min-h-screen max-w-screen-lg font-[family-name:var(--font-geist-sans)] mx-auto`}>
+      className={`${geistSans.variable} ${geistMono.variable} min-h-screen max-w-screen-lg font-[family-name:var(--font-geist-sans)] mx-auto px-10`}>
       <nav className="flex justify-between w-full py-4">
         <span className="text-2xl font-bold block" aria-label="VotesApp Logo">
           VotesApp
