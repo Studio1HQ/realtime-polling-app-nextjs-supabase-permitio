@@ -1,7 +1,8 @@
 import React from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import SignInButton from "./LogInButton";
-import SignOutButton from "./LogOutButton";
+import Link from "next/link";
+import UserDropdown from "./UserDropdown";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,11 +21,14 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     <div
       className={`${geistSans.variable} ${geistMono.variable} min-h-screen max-w-screen-lg font-[family-name:var(--font-geist-sans)] mx-auto px-10`}>
       <nav className="flex justify-between w-full py-4">
-        <span className="text-2xl font-bold block" aria-label="VotesApp Logo">
+        <Link
+          href="/"
+          className="text-2xl font-bold block"
+          aria-label="VotesApp Logo">
           VotesApp
-        </span>
+        </Link>
 
-        {!isLogged ? <SignInButton /> : <SignOutButton />}
+        {isLogged ? <SignInButton /> : <UserDropdown />}
       </nav>
 
       {children}

@@ -1,11 +1,16 @@
 import React from "react";
 
-const LogOutButton = () => {
+const LogOutButton = ({ closeDropdown }: { closeDropdown: () => void }) => {
+  const handleLogOut = () => {
+    // Log out logic
+    closeDropdown();
+  };
+
   return (
     <button
       type="button"
+      onClick={handleLogOut}
       className="flex items-center gap-2 p-2 bg-gray-800 text-white rounded-md">
-      Log Out{" "}
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="24"
@@ -21,6 +26,7 @@ const LogOutButton = () => {
         <polyline points="16 17 21 12 16 7" />
         <line x1="21" x2="9" y1="12" y2="12" />
       </svg>
+      Log Out
     </button>
   );
 };
