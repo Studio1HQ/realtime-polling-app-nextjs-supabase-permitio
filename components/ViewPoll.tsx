@@ -13,7 +13,6 @@ const ViewPoll = () => {
   return (
     <div>
       <h3 className="text-2xl font-bold">{query.id}</h3>
-      <p className="text-gray-500">Poll Description</p>
       <p className="font-[family-name:var(--font-geist-mono)] text-sm text-gray-400 mt-4">
         320 votes . 1w left
       </p>

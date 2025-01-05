@@ -6,8 +6,7 @@ const PollCard = ({ id }: { id: string }) => {
     <Link
       href={`/polls/${id}`}
       className="p-4 bg-white rounded-md shadow-md border border-gray-200 hover:scale-105 transition-transform">
-      <h3 className="text-2xl font-bold">Poll Title</h3>
-      <p className="text-gray-500">Poll Description</p>
+      <h3 className="text-2xl font-bold">Poll Question</h3>
 
       <p className="font-[family-name:var(--font-geist-mono)] text-sm text-gray-400 mt-4">
         320 votes . 1w left
