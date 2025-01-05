@@ -1,7 +1,7 @@
 import React from "react";
 import PollCard from "./PollCard";
 
-const PollGrid = ({ title, polls }: { title: string; polls: string[] }) => {
+const AllPolls = ({ title, polls }: { title: string; polls: string[] }) => {
   return (
     <section className="mb-16">
       <h2 className="text-2xl mb-4">{title}</h2>
@@ -15,4 +15,4 @@ const PollGrid = ({ title, polls }: { title: string; polls: string[] }) => {
   );
 };
 
-export default PollGrid;
+export default AllPolls;

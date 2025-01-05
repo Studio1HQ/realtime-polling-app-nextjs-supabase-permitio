@@ -1,4 +1,4 @@
-import PollGrid from "@/components/PollGrid";
+import AllPolls from "@/components/AllPolls";
 
 export default function Home() {
   return (
@@ -9,9 +9,9 @@ export default function Home() {
         </h1>
       </header>
 
-      <PollGrid title="Active Polls" polls={["1", "2", "3", "4", "5", "6"]} />
+      <AllPolls title="Active Polls" polls={["1", "2", "3", "4", "5", "6"]} />
 
-      <PollGrid title="Past Polls" polls={["1", "2", "3", "4", "5", "6"]} />
+      <AllPolls title="Past Polls" polls={["1", "2", "3", "4", "5", "6"]} />
     </main>
   );
 }
