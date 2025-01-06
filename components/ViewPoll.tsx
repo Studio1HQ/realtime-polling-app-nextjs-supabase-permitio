@@ -114,13 +114,13 @@ const ViewPoll = () => {
   const countdown = getCountdown(poll.expires_at);
 
   return (
-    <div>
+    <div className="max-w-screen-sm">
       <h3 className="text-2xl font-bold">{poll.question}</h3>
       <p className="font-[family-name:var(--font-geist-mono)] text-sm text-gray-400 mt-4">
         {totalVotes} votes . {countdown}
       </p>
 
-      <ul className="border-t border-gray-200 mt-4 pt-4 space-y-4 max-w-screen-sm">
+      <ul className="border-t border-gray-200 mt-4 pt-4 space-y-4">
         {poll.options.map(option => {
           const percentage =
             totalVotes > 0 ? (option.votes[0]?.count / totalVotes) * 100 : 0;
@@ -177,11 +177,8 @@ const ViewPoll = () => {
         })}
       </ul>
 
-      {!user && (
-        <p className="mt-4 text-center text-gray-600">Please sign in to vote</p>
-      )}
       {user && poll.created_by === user.id && (
-        <p className="mt-4 text-center text-gray-600">
+        <p className="mt-4 text-gray-600">
           You cannot vote on your own poll
         </p>
       )}
