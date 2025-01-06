@@ -1,9 +1,9 @@
 import AllPolls from "@/components/AllPolls";
 import { PollProps } from "@/helpers";
-import { createClient } from "@/utils/supabase/static-props";
+import { createClient } from "@/utils/supabase/component";
 import { useEffect, useState } from "react";
 
-export default function Page() {
+export default function Home() {
   const supabase = createClient();
 
   const [polls, setPolls] = useState<PollProps[]>([]);
@@ -22,6 +22,7 @@ export default function Page() {
             id,
             question,
             expires_at,
+            creator_name,
             votes (count)
           `
           )

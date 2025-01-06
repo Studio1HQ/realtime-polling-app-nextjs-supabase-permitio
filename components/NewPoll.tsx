@@ -64,6 +64,7 @@ const NewPoll = () => {
         question,
         expires_at: new Date(expiryDate).toISOString(),
         created_by: user?.id,
+        creator_name: user?.user_metadata?.user_name,
       })
       .select()
       .single();

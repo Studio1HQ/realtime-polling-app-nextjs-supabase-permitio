@@ -5,6 +5,7 @@ const LogInButton = () => {
   const supabase = createClient();
 
   const [showModal, setShowModal] = useState(false);
+  const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLogin, setIsLogin] = useState(true);
@@ -23,7 +24,15 @@ const LogInButton = () => {
   }
 
   async function signUp() {
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          user_name: userName,
+        },
+      },
+    });
     if (error) {
       setError(error.message);
     } else {
@@ -58,6 +67,21 @@ const LogInButton = () => {
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              {!isLogin && (
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Username
+                  </label>
+                  <input
+                    type="text"
+                    value={userName}
+                    onChange={e => setUserName(e.target.value)}
+                    className="w-full p-2 border rounded"
+                    required
+                  />
+                </div>
+              )}
+
               <div>
                 <label className="block text-sm font-medium mb-1">Email</label>
                 <input
