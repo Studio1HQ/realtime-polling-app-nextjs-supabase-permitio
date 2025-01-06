@@ -1,30 +1,25 @@
-import { useRouter } from "next/router";
+import { calculateTotalVotes, getCountdown, PollProps } from "@/helpers";
 import React from "react";
 
-const ViewPoll = () => {
-  const { query } = useRouter();
-  const options = [
-    { name: "Option 1", votes: 30 },
-    { name: "Option 2", votes: 70 },
-  ];
-
-  const totalVotes = options.reduce((sum, option) => sum + option.votes, 0);
+const ViewPoll = ({ poll }: { poll: PollProps }) => {
+  const totalVotes = calculateTotalVotes(poll.options);
+  const countdown = getCountdown(poll.expiresAt);
 
   return (
     <div>
-      <h3 className="text-2xl font-bold">{query.id}</h3>
+      <h3 className="text-2xl font-bold">{poll.title}</h3>
       <p className="font-[family-name:var(--font-geist-mono)] text-sm text-gray-400 mt-4">
-        320 votes . 1w left
+        {totalVotes} votes . {countdown}
       </p>
 
       <ul className="border-t border-gray-200 mt-4 pt-4 space-y-4 max-w-screen-sm">
-        {options.map(option => {
+        {poll.options.map(option => {
           const percentage =
             totalVotes > 0 ? (option.votes / totalVotes) * 100 : 0;
 
           return (
             <li
-              key={option.name}
+              key={option.text}
               className="relative bg-slate-100 rounded-md p-2 overflow-hidden">
               {/* Background bar */}
               <div
@@ -34,7 +29,7 @@ const ViewPoll = () => {
               {/* Content */}
               <div className="relative flex items-center justify-between z-10">
                 <span className="flex items-center gap-2">
-                  {option.name}{" "}
+                  {option.text}{" "}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"

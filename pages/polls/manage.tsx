@@ -1,14 +1,23 @@
 import NewPoll from "@/components/NewPoll";
 import AllPolls from "@/components/AllPolls";
 import React from "react";
+import ErrorMessage from "@/components/ErrorMessage";
+import polls from "@/helpers";
 
 const Page = () => {
+  const user = null;
   return (
-    <main>
-      <NewPoll />
+    <div>
+      {user ? (
+        <main>
+          <NewPoll />
 
-      <AllPolls title="Your Polls" polls={["1", "2", "3", "4", "5", "6"]} />
-    </main>
+          <AllPolls title="Your Polls" polls={polls} />
+        </main>
+      ) : (
+        <ErrorMessage />
+      )}
+    </div>
   );
 };
 

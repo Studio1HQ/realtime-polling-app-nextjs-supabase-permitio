@@ -20,7 +20,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div
       className={`${geistSans.variable} ${geistMono.variable} min-h-screen max-w-screen-lg font-[family-name:var(--font-geist-sans)] mx-auto px-10`}>
-      <nav className="flex justify-between w-full py-4">
+      <nav className="flex justify-between w-full py-4 border-b border-gray-200 mb-16">
         <Link
           href="/"
           className="text-2xl font-bold block"
@@ -28,7 +28,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           VotesApp
         </Link>
 
-        {isLogged ? <SignInButton /> : <UserDropdown />}
+        {!isLogged ? <SignInButton /> : <UserDropdown />}
       </nav>
 
       {children}
