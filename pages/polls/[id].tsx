@@ -3,8 +3,6 @@ import React, { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/component";
 import { User } from "@supabase/supabase-js";
 import ErrorMessage from "@/components/ErrorMessage";
-import polls from "@/helpers";
-import { useRouter } from "next/router";
 
 const Page = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -24,16 +22,7 @@ const Page = () => {
     fetchUser();
   }, []);
 
-  const { query } = useRouter();
-  const poll = polls.find(poll => poll.id === query.id);
-
-  return !user ? (
-    <ErrorMessage />
-  ) : poll ? (
-    <ViewPoll poll={poll} />
-  ) : (
-    <p>Poll not found.</p>
-  );
+  return !user ? <ErrorMessage /> : <ViewPoll />;
 };
 
 export default Page;

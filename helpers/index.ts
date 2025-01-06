@@ -1,10 +1,3 @@
-export type OptionProps = {
-  id: string;
-  poll_id: string;
-  text: string;
-  votes: number; // remove
-};
-
 export type VoteProps = {
   id: string;
   poll_id: string;
@@ -21,10 +14,25 @@ export type PollProps = {
   votes: {
     count: number;
   }[];
-  created_at?: string;
-  created_by?: string;
-  active?: boolean;
-  options?: OptionProps[];
+};
+
+type OptionProps = {
+  id: string;
+  text: string;
+  votes: {
+    count: number;
+  }[];
+};
+
+export type ViewPollProps = {
+  id: string;
+  question: string;
+  created_by: string;
+  created_at: string;
+  expires_at: string;
+  active: boolean;
+  creator_name: string;
+  options: OptionProps[];
 };
 
 /**
@@ -33,7 +41,7 @@ export type PollProps = {
  * @returns Total number of votes.
  */
 export const calculateTotalVotes = (options: OptionProps[]): number => {
-  return options.reduce((total, option) => total + option.votes, 0);
+  return options.reduce((total, option) => total + option.votes[0].count, 0);
 };
 
 /**

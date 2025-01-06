@@ -1,7 +1,115 @@
-import { calculateTotalVotes, getCountdown, PollProps } from "@/helpers";
-import React from "react";
+import { calculateTotalVotes, ViewPollProps, getCountdown } from "@/helpers";
+import React, { useEffect, useState } from "react";
+import { createClient } from "@/utils/supabase/component";
+import { User } from "@supabase/supabase-js";
+import { useRouter } from "next/router";
 
-const ViewPoll = ({ poll }: { poll: PollProps }) => {
+const ViewPoll = () => {
+  const { query } = useRouter();
+  const supabase = createClient();
+
+  const [poll, setPoll] = useState<ViewPollProps | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [hasVoted, setHasVoted] = useState(false);
+  const [pollLoading, setPollLoading] = useState(true);
+  const [voteLoading, setVoteLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setUser(user);
+    };
+
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    const checkUserVote = async () => {
+      if (!user) {
+        setVoteLoading(false);
+        return;
+      }
+
+      const { data: votes } = await supabase
+        .from("votes")
+        .select("id")
+        .eq("poll_id", query.id)
+        .eq("user_id", user.id)
+        .single();
+
+      setHasVoted(!!votes);
+      setVoteLoading(false);
+    };
+
+    const fetchPoll = async () => {
+      const { data } = await supabase
+        .from("polls")
+        .select(
+          `
+          *,
+          options (
+            id,
+            text,
+            votes (count)
+          )
+        `
+        )
+        .eq("id", query.id)
+        .single();
+
+      setPoll(data);
+      setPollLoading(false);
+
+      if (user) checkUserVote();
+      else setVoteLoading(false);
+    };
+
+    fetchPoll();
+
+    const channel = supabase
+      .channel(`poll-${query.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "votes",
+          filter: `poll_id=eq.${query.id}`,
+        },
+        () => {
+          fetchPoll();
+          if (user) checkUserVote();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [query.id, user]);
+
+  const handleVote = async (optionId: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase.from("votes").insert({
+        poll_id: query.id,
+        option_id: optionId,
+        user_id: user.id,
+      });
+
+      if (!error) {
+        setHasVoted(true);
+      }
+    } catch (error) {
+      console.error("Error voting:", error);
+    }
+  };
+
+  if (!poll || pollLoading || voteLoading) return <div>Loading...</div>;
+
   const totalVotes = calculateTotalVotes(poll.options);
   const countdown = getCountdown(poll.expires_at);
 
@@ -15,11 +123,26 @@ const ViewPoll = ({ poll }: { poll: PollProps }) => {
       <ul className="border-t border-gray-200 mt-4 pt-4 space-y-4 max-w-screen-sm">
         {poll.options.map(option => {
           const percentage =
-            totalVotes > 0 ? (option.votes / totalVotes) * 100 : 0;
+            totalVotes > 0 ? (option.votes[0]?.count / totalVotes) * 100 : 0;
 
+          if (!hasVoted) {
+            // Pre-voting state
+            return (
+              <li key={option.id} className="border rounded-md border-gray-200">
+                <button
+                  onClick={() => handleVote(option.id)}
+                  disabled={!user || poll.created_by === user?.id}
+                  className="w-full text-left p-4 rounded-md hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                  {option.text}
+                </button>
+              </li>
+            );
+          }
+
+          // Post-voting state
           return (
             <li
-              key={option.text}
+              key={option.id}
               className="relative bg-slate-100 rounded-md p-2 overflow-hidden">
               {/* Background bar */}
               <div
@@ -27,7 +150,7 @@ const ViewPoll = ({ poll }: { poll: PollProps }) => {
                 style={{ width: `${percentage}%` }}></div>
 
               {/* Content */}
-              <div className="relative flex items-center justify-between z-10">
+              <div className="relative flex items-center justify-between z-10 flex-wrap gap-4">
                 <span className="flex items-center gap-2">
                   {option.text}{" "}
                   <svg
@@ -45,12 +168,23 @@ const ViewPoll = ({ poll }: { poll: PollProps }) => {
                     <path d="m9 12 2 2 4-4" />
                   </svg>
                 </span>
-                {percentage.toFixed(0)}%
+                <span>
+                  {option.votes[0].count} votes - {percentage.toFixed(0)}%
+                </span>
               </div>
             </li>
           );
         })}
       </ul>
+
+      {!user && (
+        <p className="mt-4 text-center text-gray-600">Please sign in to vote</p>
+      )}
+      {user && poll.created_by === user.id && (
+        <p className="mt-4 text-center text-gray-600">
+          You cannot vote on your own poll
+        </p>
+      )}
     </div>
   );
 };
