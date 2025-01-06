@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useRouter } from "next/router";
-
 import { createClient } from "@/utils/supabase/component";
 
 const LogInButton = () => {
@@ -10,7 +8,6 @@ const LogInButton = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState("");
 
-  const router = useRouter();
   const supabase = createClient();
 
   async function logIn() {
@@ -18,18 +15,12 @@ const LogInButton = () => {
       email,
       password,
     });
-    if (error) {
-      throw error;
-    }
-    router.push("/");
+    return error;
   }
 
   async function signUp() {
     const { error } = await supabase.auth.signUp({ email, password });
-    if (error) {
-      throw error;
-    }
-    router.push("/");
+    return error;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,14 +28,17 @@ const LogInButton = () => {
     setError("");
 
     try {
-      if (isLogin) {
-        logIn();
+      const error = isLogin ? await logIn() : await signUp();
+      if (error) {
+        setError(error.message);
       } else {
-        signUp();
+        setShowModal(false);
       }
-      setShowModal(false);
     } catch (error) {
-      setError((error as Error).message);
+      setError(
+        (error as Error).message ||
+          "An unexpected error occurred. Please try again."
+      );
     }
   };
 
