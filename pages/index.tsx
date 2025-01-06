@@ -40,7 +40,15 @@ export default function Home() {
         // Fetch past polls
         const { data: expiredPolls, error: pastError } = await supabase
           .from("polls")
-          .select("*")
+          .select(
+            `
+            id,
+            question,
+            expires_at,
+            creator_name,
+            votes (count)
+          `
+          )
           .eq("active", true)
           .lt("expires_at", now)
           .order("created_at", { ascending: false });
