@@ -1,26 +1,119 @@
-import React from "react";
+import { useState } from "react";
+import { useRouter } from "next/router";
+
+import { createClient } from "@/utils/supabase/component";
 
 const LogInButton = () => {
+  const [showModal, setShowModal] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLogin, setIsLogin] = useState(true);
+  const [error, setError] = useState("");
+
+  const router = useRouter();
+  const supabase = createClient();
+
+  async function logIn() {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) {
+      throw error;
+    }
+    router.push("/");
+  }
+
+  async function signUp() {
+    const { error } = await supabase.auth.signUp({ email, password });
+    if (error) {
+      throw error;
+    }
+    router.push("/");
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      if (isLogin) {
+        logIn();
+      } else {
+        signUp();
+      }
+      setShowModal(false);
+    } catch (error) {
+      setError((error as Error).message);
+    }
+  };
+
   return (
-    <button
-      type="button"
-      className="flex items-center gap-2 p-2 bg-gray-800 text-white rounded-md">
-      Log In
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        className="lucide lucide-github">
-        <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
-        <path d="M9 18c-4.51 2-5-2-7-2" />
-      </svg>
-    </button>
+    <>
+      <button
+        onClick={() => setShowModal(true)}
+        className="flex items-center gap-2 p-2 bg-gray-800 text-white rounded-md">
+        Log In
+      </button>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg max-w-sm w-full relative">
+            <h2 className="text-xl font-bold mb-4">
+              {isLogin ? "Log In" : "Sign Up"}
+            </h2>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  className="w-full p-2 border rounded"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  className="w-full p-2 border rounded"
+                  required
+                />
+              </div>
+
+              {error && <p className="text-red-500 text-sm">{error}</p>}
+
+              <div className="flex justify-between items-center">
+                <button
+                  type="button"
+                  onClick={() => setIsLogin(!isLogin)}
+                  className="text-sm text-gray-600">
+                  {isLogin ? "Need an account?" : "Already have an account?"}
+                </button>
+                <button
+                  type="submit"
+                  className="bg-gray-800 text-white px-4 py-2 rounded">
+                  {isLogin ? "Log In" : "Sign Up"}
+                </button>
+              </div>
+            </form>
+
+            <button
+              onClick={() => setShowModal(false)}
+              className="absolute top-2 right-2 text-gray-500">
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
