@@ -1,9 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import LogOutButton from "./LogOutButton";
-import Image from "next/image";
 import ManageButton from "./ManageButton";
 
-function UserDropdown() {
+function MenuDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -37,13 +36,21 @@ function UserDropdown() {
       <button
         onClick={toggleDropdown}
         className="flex items-center focus:outline-none">
-        <Image
-          src="/path-to-avatar.jpg"
-          alt="User Avatar"
-          width={40}
-          height={40}
-          className="w-10 h-10 rounded-full border-2 border-gray-500"
-        />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="lucide lucide-align-justify">
+          <path d="M3 12h18" />
+          <path d="M3 18h18" />
+          <path d="M3 6h18" />
+        </svg>
       </button>
 
       {/* Dropdown Menu */}
@@ -59,4 +66,4 @@ function UserDropdown() {
   );
 }
 
-export default UserDropdown;
+export default MenuDropdown;

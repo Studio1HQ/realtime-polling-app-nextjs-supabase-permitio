@@ -16,9 +16,7 @@ const Page = ({ user }: { user: User }) => {
   ) : poll ? (
     <ViewPoll poll={poll} />
   ) : (
-        <p>Poll not found. 
-          
-    </p>
+    <p>Poll not found.</p>
   );
 };
 
@@ -33,6 +31,10 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     return {
       props: {
         user: null,
+      },
+      redirect: {
+        destination: "/",
+        permanent: false,
       },
     };
   }

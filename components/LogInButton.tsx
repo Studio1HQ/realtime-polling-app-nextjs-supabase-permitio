@@ -2,43 +2,43 @@ import { useState } from "react";
 import { createClient } from "@/utils/supabase/component";
 
 const LogInButton = () => {
+  const supabase = createClient();
+
   const [showModal, setShowModal] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState("");
 
-  const supabase = createClient();
-
   async function logIn() {
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    return error;
+    if (error) {
+      setError(error.message);
+    } else {
+      setShowModal(false);
+    }
   }
 
   async function signUp() {
     const { error } = await supabase.auth.signUp({ email, password });
-    return error;
+    if (error) {
+      setError(error.message);
+    } else {
+      setShowModal(false);
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    try {
-      const error = isLogin ? await logIn() : await signUp();
-      if (error) {
-        setError(error.message);
-      } else {
-        setShowModal(false);
-      }
-    } catch (error) {
-      setError(
-        (error as Error).message ||
-          "An unexpected error occurred. Please try again."
-      );
+    if (isLogin) {
+      await logIn();
+    } else {
+      await signUp();
     }
   };
 
@@ -51,7 +51,7 @@ const LogInButton = () => {
       </button>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10">
           <div className="bg-white p-6 rounded-lg max-w-sm w-full relative">
             <h2 className="text-xl font-bold mb-4">
               {isLogin ? "Log In" : "Sign Up"}

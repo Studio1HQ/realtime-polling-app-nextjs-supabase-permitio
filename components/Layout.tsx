@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import SignInButton from "./LogInButton";
 import Link from "next/link";
-import UserDropdown from "./UserDropdown";
+import MenuDropdown from "./MenuDropdown";
+import { createClient } from "@/utils/supabase/component";
+import { User } from "@supabase/supabase-js";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,7 +17,17 @@ const geistMono = Geist_Mono({
 });
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
-  const isLogged = false;
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const supabase = createClient();
+      const { data } = await supabase.auth.getUser();
+      setUser(data?.user || null);
+    };
+
+    fetchUser();
+  }, []);
 
   return (
     <div
@@ -28,7 +40,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           VotesApp
         </Link>
 
-        {!isLogged ? <SignInButton /> : <UserDropdown />}
+        {!user ? <SignInButton /> : <MenuDropdown />}
       </nav>
 
       {children}

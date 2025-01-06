@@ -10,14 +10,14 @@ import polls from "@/helpers";
 const Page = ({ user }: { user: User }) => {
   return (
     <div>
-      {user ? (
+      {!user ? (
+        <ErrorMessage />
+      ) : (
         <main>
           <NewPoll />
 
           <AllPolls title="Your Polls" polls={polls} />
         </main>
-      ) : (
-        <ErrorMessage />
       )}
     </div>
   );
@@ -34,6 +34,10 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     return {
       props: {
         user: null,
+      },
+      redirect: {
+        destination: "/",
+        permanent: false,
       },
     };
   }
