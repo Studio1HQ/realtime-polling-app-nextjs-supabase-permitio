@@ -8,9 +8,11 @@ export default function Home() {
 
   const [polls, setPolls] = useState<PollProps[]>([]);
   const [pastPolls, setPastPolls] = useState<PollProps[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPolls = async () => {
+      setLoading(true);
       const now = new Date().toISOString();
 
       try {
@@ -52,6 +54,8 @@ export default function Home() {
         setPastPolls(expiredPolls);
       } catch (error) {
         console.error("Unexpected error fetching polls:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -77,6 +81,19 @@ export default function Home() {
   }, []);
 
   console.log(polls, pastPolls);
+
+  if (loading) {
+    return (
+      <main>
+        <header className="mb-8">
+          <h1 hidden>
+            Welcome to <span className="text-2xl font-bold">VotesApp</span>
+          </h1>
+        </header>
+        <p>Loading polls...</p>
+      </main>
+    );
+  }
 
   return (
     <main>

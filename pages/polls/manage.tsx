@@ -10,12 +10,15 @@ const Page = () => {
   const supabase = createClient();
   const [user, setUser] = useState<User | null>(null);
   const [polls, setPolls] = useState<PollProps[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUser = async () => {
-      const supabase = createClient();
       const { data } = supabase.auth.onAuthStateChange((event, session) => {
         setUser(session?.user || null);
+        if (!session?.user) {
+          setLoading(false);
+        }
       });
 
       return () => {
@@ -54,6 +57,8 @@ const Page = () => {
         setPolls(data || []);
       } catch (error) {
         console.error("Unexpected error fetching polls:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -78,6 +83,10 @@ const Page = () => {
       supabase.removeChannel(channel);
     };
   }, [user]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div>
