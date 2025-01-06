@@ -22,8 +22,14 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const fetchUser = async () => {
       const supabase = createClient();
-      const { data } = await supabase.auth.getUser();
-      setUser(data?.user || null);
+      const { data } = supabase.auth.onAuthStateChange((event, session) => {
+        console.log(session?.user);
+        setUser(session?.user || null);
+      });
+
+      return () => {
+        data.subscription.unsubscribe();
+      };
     };
 
     fetchUser();

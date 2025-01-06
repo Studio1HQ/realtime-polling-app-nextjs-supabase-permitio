@@ -1,9 +1,14 @@
-import React from "react";
+import { createClient } from "@/utils/supabase/component";
+import { useRouter } from "next/router";
 
 const LogOutButton = ({ closeDropdown }: { closeDropdown: () => void }) => {
-  const handleLogOut = () => {
-    // Log out logic
+  const router = useRouter();
+  const supabase = createClient();
+
+  const handleLogOut = async () => {
+    await supabase.auth.signOut();
     closeDropdown();
+    router.push("/");
   };
 
   return (

@@ -5,6 +5,7 @@ import React from "react";
 const PollCard = ({ poll }: { poll: PollProps }) => {
   const totalVotes = calculateTotalVotes(poll.options);
   const countdown = getCountdown(poll.expiresAt);
+  
   return (
     <Link
       href={`/polls/${poll.id}`}
