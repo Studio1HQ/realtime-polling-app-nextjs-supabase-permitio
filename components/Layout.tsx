@@ -23,7 +23,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     const fetchUser = async () => {
       const supabase = createClient();
       const { data } = supabase.auth.onAuthStateChange((event, session) => {
-        console.log(session?.user);
         setUser(session?.user || null);
       });
 

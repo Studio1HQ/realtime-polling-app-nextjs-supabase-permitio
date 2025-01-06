@@ -1,10 +1,32 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { createClient } from "@/utils/supabase/component";
+import { User } from "@supabase/supabase-js";
 
 const NewPoll = () => {
+  const supabase = createClient();
+
+  const [user, setUser] = useState<User | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState([""]);
   const [expiryDate, setExpiryDate] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const supabase = createClient();
+      const { data } = supabase.auth.onAuthStateChange((event, session) => {
+        setUser(session?.user || null);
+      });
+
+      return () => {
+        data.subscription.unsubscribe();
+      };
+    };
+
+    fetchUser();
+  }, []);
 
   const toggleForm = () => setShowForm(prev => !prev);
 
@@ -23,20 +45,51 @@ const NewPoll = () => {
     setQuestion("");
     setOptions([""]);
     setExpiryDate("");
+    setSuccessMessage("");
+    setErrorMessage("");
     setShowForm(false);
   };
 
-  const handleSubmit = (e: { preventDefault: () => void }) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (question.trim() && options.filter(opt => opt.trim()).length >= 2) {
-      console.log({
+
+    if (question.trim() && options.filter(opt => opt.trim()).length < 2) {
+      setErrorMessage("Please provide a question and at least two options.");
+      return;
+    }
+
+    const { data: poll, error: pollError } = await supabase
+      .from("polls")
+      .insert({
         question,
-        options: options.filter(opt => opt.trim()),
-        expiryDate,
-      });
-      handleCancel(); // Clear inputs and hide the form after submission
+        expires_at: new Date(expiryDate).toISOString(),
+        created_by: user?.id,
+      })
+      .select()
+      .single();
+
+    if (pollError) {
+      console.error("Error creating poll:", pollError);
+      setErrorMessage(pollError.message);
+      return;
+    }
+
+    // Insert options
+    const { error: optionsError } = await supabase.from("options").insert(
+      options
+        .filter(opt => opt.trim())
+        .map(text => ({
+          poll_id: poll.id,
+          text,
+        }))
+    );
+
+    if (!optionsError) {
+      setSuccessMessage("Poll created successfully!");
+      handleCancel();
     } else {
-      alert("Please provide a question and at least two options.");
+      console.error("Error creating options:", optionsError);
+      setErrorMessage(optionsError.message);
     }
   };
 
@@ -69,6 +122,20 @@ const NewPoll = () => {
         </svg>
         New Poll
       </button>
+
+      {/* Success Message */}
+      {successMessage && (
+        <div className="p-4 bg-green-100 text-green-700 rounded-md max-w-md">
+          {successMessage}
+        </div>
+      )}
+
+      {/* Error Message */}
+      {errorMessage && (
+        <div className="p-4 bg-red-100 text-red-700 rounded-md max-w-md">
+          {errorMessage}
+        </div>
+      )}
 
       {/* Poll Form */}
       {showForm && (

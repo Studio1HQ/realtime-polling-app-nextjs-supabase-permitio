@@ -1,17 +1,29 @@
-// Define types
 export type OptionProps = {
   id: string;
+  poll_id: string;
   text: string;
-  votes: number;
+  votes: number; // remove
+};
+
+export type VoteProps = {
+  id: string;
+  poll_id: string;
+  user_id: string;
+  created_at: string;
+  option_id: string;
 };
 
 export type PollProps = {
   id: string;
-  title: string;
-  type: "single-choice" | "multi-choice" | "rating";
+  created_at: string;
+  created_by: string;
+  active: boolean;
+  question: string;
+  expires_at: string;
   options: OptionProps[];
-  createdAt: string;
-  expiresAt: string;
+  votes: {
+    count: string;
+  }[];
 };
 
 /**

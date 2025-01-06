@@ -3,11 +3,11 @@ import React from "react";
 
 const ViewPoll = ({ poll }: { poll: PollProps }) => {
   const totalVotes = calculateTotalVotes(poll.options);
-  const countdown = getCountdown(poll.expiresAt);
+  const countdown = getCountdown(poll.expires_at);
 
   return (
     <div>
-      <h3 className="text-2xl font-bold">{poll.title}</h3>
+      <h3 className="text-2xl font-bold">{poll.question}</h3>
       <p className="font-[family-name:var(--font-geist-mono)] text-sm text-gray-400 mt-4">
         {totalVotes} votes . {countdown}
       </p>

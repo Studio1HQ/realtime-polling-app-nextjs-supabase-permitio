@@ -8,9 +8,11 @@ const AllPolls = ({ title, polls }: { title: string; polls: PollProps[] }) => {
       <h2 className="text-2xl mb-4">{title}</h2>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {polls.map(poll => (
-          <PollCard poll={poll} key={poll.id} />
-        ))}
+        {polls.length > 0 ? (
+          polls.map(poll => <PollCard poll={poll} key={poll.id} />)
+        ) : (
+          <p className="text-gray-500">No polls found.</p>
+        )}
       </div>
     </section>
   );
