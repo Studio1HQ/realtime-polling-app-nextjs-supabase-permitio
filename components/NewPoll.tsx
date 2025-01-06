@@ -75,7 +75,6 @@ const NewPoll = () => {
       return;
     }
 
-    // Insert options
     const { error: optionsError } = await supabase.from("options").insert(
       options
         .filter(opt => opt.trim())

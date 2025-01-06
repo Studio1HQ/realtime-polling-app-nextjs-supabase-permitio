@@ -80,8 +80,6 @@ export default function Home() {
     };
   }, []);
 
-  console.log(polls, pastPolls);
-
   if (loading) {
     return (
       <main>

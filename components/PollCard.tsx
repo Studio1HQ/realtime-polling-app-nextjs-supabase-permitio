@@ -4,7 +4,7 @@ import React from "react";
 
 const PollCard = ({ poll }: { poll: PollProps }) => {
   const countdown = getCountdown(poll?.expires_at);
-  const votes = poll?.votes[0]?.count ? poll?.votes[0]?.count : 0;
+  const votes = poll?.votes[0]?.count || 0;
 
   return (
     <Link
