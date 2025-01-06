@@ -26,12 +26,11 @@ const ViewPoll = () => {
   }, []);
 
   useEffect(() => {
-    const checkUserVote = async () => {
-      if (!user) {
-        setVoteLoading(false);
-        return;
-      }
+    if (!user) {
+      return;
+    }
 
+    const checkUserVote = async () => {
       const { data: votes } = await supabase
         .from("votes")
         .select("id")
@@ -62,8 +61,7 @@ const ViewPoll = () => {
       setPoll(data);
       setPollLoading(false);
 
-      if (user) checkUserVote();
-      else setVoteLoading(false);
+      checkUserVote();
     };
 
     fetchPoll();
@@ -80,7 +78,7 @@ const ViewPoll = () => {
         },
         () => {
           fetchPoll();
-          if (user) checkUserVote();
+          checkUserVote();
         }
       )
       .subscribe();
@@ -178,9 +176,7 @@ const ViewPoll = () => {
       </ul>
 
       {user && poll.created_by === user.id && (
-        <p className="mt-4 text-gray-600">
-          You cannot vote on your own poll
-        </p>
+        <p className="mt-4 text-gray-600">You cannot vote on your own poll</p>
       )}
     </div>
   );
