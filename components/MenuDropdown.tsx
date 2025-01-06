@@ -32,7 +32,6 @@ function MenuDropdown() {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* Avatar Button */}
       <button
         onClick={toggleDropdown}
         className="flex items-center focus:outline-none">
@@ -53,7 +52,6 @@ function MenuDropdown() {
         </svg>
       </button>
 
-      {/* Dropdown Menu */}
       {isOpen && (
         <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg p-4 z-50">
           <div className="grid items-center gap-4">
