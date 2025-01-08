@@ -1,32 +1,44 @@
-// Follow this setup guide to integrate the Deno language server with your editor:
-// https://deno.land/manual/getting_started/setup_your_environment
-// This enables autocomplete, go to definition, etc.
+import { Permit } from "npm:permitio";
 
-// Setup type definitions for built-in Supabase Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts"
+// Initialize Permit client
+const permit = new Permit({
+  token: Deno.env.get("PERMIT_API_KEY"),
+  pdp: "http://localhost:7766",
+});
 
-console.log("Hello from Functions!")
+console.log("Hello from Functions!");
 
 Deno.serve(async (req) => {
-  const { name } = await req.json()
-  const data = {
-    message: `Hello ${name}!`,
+  try {
+    const { userId, operation, key } = await req.json();
+
+    // Validate input parameters
+    if (!userId || !operation || !key) {
+      return new Response(
+        JSON.stringify({ error: "Missing required parameters." }),
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
+    }
+
+    // Check the user's permission for the operation in the specified polls key
+    const permitted = await permit.check(userId, operation, {
+      type: "polls",
+      key,
+      tenant: "default",
+    });
+
+    return new Response(
+      JSON.stringify({ permitted }),
+      { status: 200, headers: { "Content-Type": "application/json" } },
+    );
+  } catch (error) {
+    console.error("Error checking user permission: ", error);
+
+    return new Response(
+      JSON.stringify({
+        error: "Error occurred while checking user permission.",
+      }),
+      { status: 500, headers: { "Content-Type": "application/json" } },
+    );
   }
-
-  return new Response(
-    JSON.stringify(data),
-    { headers: { "Content-Type": "application/json" } },
-  )
-})
-
-/* To invoke locally:
-
-  1. Run `supabase start` (see: https://supabase.com/docs/reference/cli/supabase-start)
-  2. Make an HTTP request:
-
-  curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/checkPermission' \
-    --header 'Authorization: Bearer ' \
-    --header 'Content-Type: application/json' \
-    --data '{"name":"Functions"}'
-
-*/
+});
