@@ -1,32 +1,46 @@
-// Follow this setup guide to integrate the Deno language server with your editor:
-// https://deno.land/manual/getting_started/setup_your_environment
-// This enables autocomplete, go to definition, etc.
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { Permit } from "npm:permitio";
 
-// Setup type definitions for built-in Supabase Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts"
+ const permit = new Permit({
+    token: Deno.env.get("PERMIT_API_KEY"),
+    pdp: "http://localhost:7766",
+});
 
-console.log("Hello from Functions!")
 
+// Supabase Edge Function to sync new users with Permit.io
 Deno.serve(async (req) => {
-  const { name } = await req.json()
-  const data = {
-    message: `Hello ${name}!`,
+  try {
+    const { event, user } = await req.json();
+
+    // Only proceed if the event type is "SIGNED_UP"
+    if (event === "SIGNED_UP" && user) {
+      const newUser = {
+        key: user.id,
+        email: user.email,
+        name: user.user_metadata?.name || "Someone",
+      };
+
+      // Sync the user to Permit.io
+      await permit.api.createUser(newUser);
+      await permit.api.assignRole({
+        role: "authenticated",
+        tenant: "default",
+        user: user.id,
+      });
+
+      console.log(`User ${user.email} synced to Permit.io successfully.`);
+    }
+
+    // Return success response
+    return new Response(
+      JSON.stringify({ message: "User synced successfully!" }),
+      { status: 200, headers: { "Content-Type": "application/json" } },
+    );
+  } catch (error) {
+    console.error("Error syncing user to Permit: ", error);
+    return new Response(
+      JSON.stringify({ error: "Error syncing user to Permit." }),
+      { status: 500, headers: { "Content-Type": "application/json" } },
+    );
   }
-
-  return new Response(
-    JSON.stringify(data),
-    { headers: { "Content-Type": "application/json" } },
-  )
-})
-
-/* To invoke locally:
-
-  1. Run `supabase start` (see: https://supabase.com/docs/reference/cli/supabase-start)
-  2. Make an HTTP request:
-
-  curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/syncUser' \
-    --header 'Authorization: Bearer ' \
-    --header 'Content-Type: application/json' \
-    --data '{"name":"Functions"}'
-
-*/
+});
