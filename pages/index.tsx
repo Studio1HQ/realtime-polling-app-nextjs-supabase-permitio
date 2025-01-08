@@ -1,14 +1,14 @@
+import { useEffect, useState } from "react";
 import AllPolls from "@/components/AllPolls";
 import { PollProps } from "@/helpers";
 import { createClient } from "@/utils/supabase/component";
-import { useEffect, useState } from "react";
 
 export default function Home() {
-  const supabase = createClient();
-
-  const [polls, setPolls] = useState<PollProps[]>([]);
+  const [currentPolls, setCurrentPolls] = useState<PollProps[]>([]);
   const [pastPolls, setPastPolls] = useState<PollProps[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const supabase = createClient();
 
   useEffect(() => {
     const fetchPolls = async () => {
@@ -25,10 +25,10 @@ export default function Home() {
             question,
             expires_at,
             creator_name,
+            created_by,
             votes (count)
           `
           )
-          .eq("active", true)
           .gte("expires_at", now)
           .order("created_at", { ascending: false });
 
@@ -46,10 +46,10 @@ export default function Home() {
             question,
             expires_at,
             creator_name,
+            created_by,
             votes (count)
           `
           )
-          .eq("active", true)
           .lt("expires_at", now)
           .order("created_at", { ascending: false });
 
@@ -58,7 +58,7 @@ export default function Home() {
           return;
         }
 
-        setPolls(activePolls);
+        setCurrentPolls(activePolls);
         setPastPolls(expiredPolls);
       } catch (error) {
         console.error("Unexpected error fetching polls:", error);
@@ -109,7 +109,7 @@ export default function Home() {
         </h1>
       </header>
 
-      <AllPolls title="Active Polls" polls={polls} />
+      <AllPolls title="Active Polls" polls={currentPolls} />
       <AllPolls title="Past Polls" polls={pastPolls} />
     </main>
   );

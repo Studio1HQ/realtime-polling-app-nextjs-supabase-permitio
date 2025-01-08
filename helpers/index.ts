@@ -11,6 +11,7 @@ export type PollProps = {
   question: string;
   expires_at: string;
   creator_name: string;
+  created_by: string;
   votes: {
     count: number;
   }[];

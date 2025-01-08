@@ -3,8 +3,6 @@ import { createClient } from "@/utils/supabase/component";
 import { User } from "@supabase/supabase-js";
 
 const NewPoll = () => {
-  const supabase = createClient();
-
   const [user, setUser] = useState<User | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [question, setQuestion] = useState("");
@@ -12,6 +10,8 @@ const NewPoll = () => {
   const [expiryDate, setExpiryDate] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  const supabase = createClient();
 
   useEffect(() => {
     const fetchUser = async () => {

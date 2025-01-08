@@ -1,16 +1,17 @@
+import React, { useEffect, useState } from "react";
 import NewPoll from "@/components/NewPoll";
 import AllPolls from "@/components/AllPolls";
-import React, { useEffect, useState } from "react";
 import ErrorMessage from "@/components/ErrorMessage";
+import { PollProps } from "@/helpers";
 import { createClient } from "@/utils/supabase/component";
 import { User } from "@supabase/supabase-js";
-import { PollProps } from "@/helpers";
 
 const Page = () => {
-  const supabase = createClient();
   const [user, setUser] = useState<User | null>(null);
   const [polls, setPolls] = useState<PollProps[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const supabase = createClient();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -42,10 +43,10 @@ const Page = () => {
             question,
             expires_at,
             creator_name,
+            created_by,
             votes (count)
           `
           )
-          .eq("active", true)
           .eq("created_by", user.id)
           .order("created_at", { ascending: false });
 

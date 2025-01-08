@@ -1,18 +1,19 @@
-import { calculateTotalVotes, ViewPollProps, getCountdown } from "@/helpers";
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { calculateTotalVotes, ViewPollProps, getCountdown } from "@/helpers";
 import { createClient } from "@/utils/supabase/component";
 import { User } from "@supabase/supabase-js";
-import { useRouter } from "next/router";
 
 const ViewPoll = () => {
   const { query } = useRouter();
-  const supabase = createClient();
 
   const [poll, setPoll] = useState<ViewPollProps | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [pollLoading, setPollLoading] = useState(true);
   const [voteLoading, setVoteLoading] = useState(true);
+
+  const supabase = createClient();
 
   useEffect(() => {
     const fetchUser = async () => {
