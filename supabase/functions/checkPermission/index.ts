@@ -3,7 +3,7 @@ import { Permit } from "npm:permitio";
 // Initialize Permit client
 const permit = new Permit({
   token: Deno.env.get("PERMIT_API_KEY"),
-  pdp: "http://localhost:7766",
+  pdp: "https://real-time-polling-app-production.up.railway.app",
 });
 
 console.log("Hello from Functions!");
