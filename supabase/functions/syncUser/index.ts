@@ -11,7 +11,7 @@ import { Permit } from "npm:permitio";
 Deno.serve(async (req) => {
 
    const permit = new Permit({
-    token: "permit_key_CIsSsMX0KQcIZDnVZr1R23pWkNQPp6ngjibiyMCpBKA1haiNmEf4ctjvdese5eg75LCCHaRbfYpk6c4J05yBOY",
+    token: Deno.env.get("PERMIT_API_KEY"),
     pdp: "https://real-time-polling-app-production.up.railway.app",
    });
   
