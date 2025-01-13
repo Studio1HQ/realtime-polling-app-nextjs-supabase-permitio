@@ -1,14 +1,20 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { Permit } from "npm:permitio";
 
- const permit = new Permit({
-    token: Deno.env.get("PERMIT_API_KEY"),
-    pdp: "https://real-time-polling-app-production.up.railway.app",
-});
-
+ const corsHeaders = {
+  'Access-Control-Allow-Origin': "*",
+  'Access-Control-Allow-Headers': 'Authorization, x-client-info, apikey, Content-Type',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE',
+}
 
 // Supabase Edge Function to sync new users with Permit.io
 Deno.serve(async (req) => {
+
+   const permit = new Permit({
+    token: "permit_key_CIsSsMX0KQcIZDnVZr1R23pWkNQPp6ngjibiyMCpBKA1haiNmEf4ctjvdese5eg75LCCHaRbfYpk6c4J05yBOY",
+    pdp: "https://real-time-polling-app-production.up.railway.app",
+   });
+  
   try {
     const { event, user } = await req.json();
 
@@ -34,12 +40,15 @@ Deno.serve(async (req) => {
     // Return success response
     return new Response(
       JSON.stringify({ message: "User synced successfully!" }),
-      { status: 200, headers: { "Content-Type": "application/json" } },
+      { status: 200, headers: corsHeaders },
     );
   } catch (error) {
     console.error("Error syncing user to Permit: ", error);
     return new Response(
-      JSON.stringify({ error: "Error syncing user to Permit." }),
+      JSON.stringify({
+        message: "Error syncing user to Permit.",
+        "error": error
+      }),
       { status: 500, headers: { "Content-Type": "application/json" } },
     );
   }
