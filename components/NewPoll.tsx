@@ -58,38 +58,68 @@ const NewPoll = () => {
       return;
     }
 
-    const { data: poll, error: pollError } = await supabase
-      .from("polls")
-      .insert({
-        question,
-        expires_at: new Date(expiryDate).toISOString(),
-        created_by: user?.id,
-        creator_name: user?.user_metadata?.user_name,
-      })
-      .select()
-      .single();
+    try {
+      // Create the poll
+      const { data: poll, error: pollError } = await supabase
+        .from("polls")
+        .insert({
+          question,
+          expires_at: new Date(expiryDate).toISOString(),
+          created_by: user?.id,
+          creator_name: user?.user_metadata?.user_name,
+        })
+        .select()
+        .single();
 
-    if (pollError) {
-      console.error("Error creating poll:", pollError);
-      setErrorMessage(pollError.message);
-      return;
-    }
+      if (pollError) {
+        console.error("Error creating poll:", pollError);
+        setErrorMessage(pollError.message);
+        return;
+      }
 
-    const { error: optionsError } = await supabase.from("options").insert(
-      options
-        .filter(opt => opt.trim())
-        .map(text => ({
-          poll_id: poll.id,
-          text,
-        }))
-    );
+      // Create the options
+      const { error: optionsError } = await supabase.from("options").insert(
+        options
+          .filter(opt => opt.trim())
+          .map(text => ({
+            poll_id: poll.id,
+            text,
+          }))
+      );
 
-    if (!optionsError) {
+      if (optionsError) {
+        console.error("Error creating options:", optionsError);
+        setErrorMessage(optionsError.message);
+        return;
+      }
+
+      // Update the creator role in Permit.io
+      const response = await fetch(
+        "http://127.0.0.1:54321/functions/v1//updateCreatorRole",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: user?.id,
+            pollId: poll.id,
+          }),
+        }
+      );
+
+      const { success, error } = await response.json();
+
+      if (!success) {
+        console.error("Error updating creator role:", error);
+        // Note: We don't set an error message here as the poll was still created successfully
+      }
+
       setSuccessMessage("Poll created successfully!");
       handleCancel();
-    } else {
-      console.error("Error creating options:", optionsError);
-      setErrorMessage(optionsError.message);
+    } catch (error) {
+      console.error("Error in poll creation process:", error);
+      setErrorMessage("An unexpected error occurred while creating the poll.");
     }
   };
 

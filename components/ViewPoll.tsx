@@ -28,21 +28,24 @@ const ViewPoll = () => {
 
   // Check voting permission using Permit.io
   useEffect(() => {
-    const checkVotingPermission = async () => {
+    const checkPermission = async () => {
       if (!user || !query.id) return;
 
       try {
-        const response = await fetch("/api/checkVotingPermission", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: user.id,
-            operation: "create",
-            key: query.id,
-          }),
-        });
+        const response = await fetch(
+          " http://127.0.0.1:54321/functions/v1//checkPermission",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: user.id,
+              operation: "create",
+              key: query.id,
+            }),
+          }
+        );
 
         const { permitted } = await response.json();
         setCanVote(permitted);
@@ -52,7 +55,7 @@ const ViewPoll = () => {
       }
     };
 
-    checkVotingPermission();
+    checkPermission();
   }, [user, query.id]);
 
   useEffect(() => {
