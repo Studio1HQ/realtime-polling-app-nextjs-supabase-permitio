@@ -7,9 +7,7 @@ import { Permit } from "npm:permitio";
   'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE',
 }
 
-// Supabase Edge Function to sync new users with Permit.io
 Deno.serve(async (req) => {
-
    const permit = new Permit({
     token: Deno.env.get("PERMIT_API_KEY"),
     pdp: "https://real-time-polling-app-production.up.railway.app",

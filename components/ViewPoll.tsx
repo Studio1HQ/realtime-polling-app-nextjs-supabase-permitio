@@ -6,14 +6,14 @@ import { User } from "@supabase/supabase-js";
 
 const ViewPoll = () => {
   const { query } = useRouter();
+  const supabase = createClient();
 
   const [poll, setPoll] = useState<ViewPollProps | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [pollLoading, setPollLoading] = useState(true);
   const [voteLoading, setVoteLoading] = useState(true);
-
-  const supabase = createClient();
+  const [canVote, setCanVote] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -25,6 +25,35 @@ const ViewPoll = () => {
 
     fetchUser();
   }, []);
+
+  // Check voting permission using Permit.io
+  useEffect(() => {
+    const checkVotingPermission = async () => {
+      if (!user || !query.id) return;
+
+      try {
+        const response = await fetch("/api/checkVotingPermission", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: user.id,
+            operation: "create",
+            key: query.id,
+          }),
+        });
+
+        const { permitted } = await response.json();
+        setCanVote(permitted);
+      } catch (error) {
+        console.error("Error checking permission:", error);
+        setCanVote(false);
+      }
+    };
+
+    checkVotingPermission();
+  }, [user, query.id]);
 
   useEffect(() => {
     if (!user) {
@@ -130,7 +159,7 @@ const ViewPoll = () => {
               <li key={option.id} className="border rounded-md border-gray-200">
                 <button
                   onClick={() => handleVote(option.id)}
-                  disabled={!user || poll.created_by === user?.id}
+                  disabled={!user || !canVote}
                   className="w-full text-left p-4 rounded-md hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                   {option.text}
                 </button>
@@ -143,12 +172,10 @@ const ViewPoll = () => {
             <li
               key={option.id}
               className="relative bg-slate-100 rounded-md p-2 overflow-hidden">
-              {/* Background bar */}
               <div
                 className="absolute inset-0 bg-gray-400 transition-all duration-300"
                 style={{ width: `${percentage}%` }}></div>
 
-              {/* Content */}
               <div className="relative flex items-center justify-between z-10 flex-wrap gap-4">
                 <span className="flex items-center gap-2">
                   {option.text}{" "}
@@ -176,7 +203,7 @@ const ViewPoll = () => {
         })}
       </ul>
 
-      {user && poll.created_by === user.id && (
+      {user && !canVote && (
         <p className="mt-4 text-gray-600">You cannot vote on your own poll</p>
       )}
     </div>
