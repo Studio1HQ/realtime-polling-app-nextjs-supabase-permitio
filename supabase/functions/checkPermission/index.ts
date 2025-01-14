@@ -10,7 +10,7 @@ import { Permit } from "npm:permitio";
 Deno.serve(async (req) => {
   const permit = new Permit({
     token: Deno.env.get("PERMIT_API_KEY"),
-    pdp: "https://real-time-polling-app-production.up.railway.app",
+    pdp: "https://realtime-polling-app-nextjs-supabase-permitio-production.up.railway.app",
   });
   
   try {
