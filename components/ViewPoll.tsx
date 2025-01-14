@@ -14,6 +14,7 @@ const ViewPoll = () => {
   const [pollLoading, setPollLoading] = useState(true);
   const [voteLoading, setVoteLoading] = useState(true);
   const [canVote, setCanVote] = useState(false);
+  const [hasExpired, setHasExpired] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -24,7 +25,7 @@ const ViewPoll = () => {
     };
 
     fetchUser();
-  }, []);
+  }, [supabase.auth]);
 
   // Check voting permission using Permit.io
   useEffect(() => {
@@ -119,7 +120,18 @@ const ViewPoll = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [query.id, user]);
+  }, [query.id, supabase, user]);
+
+  useEffect(() => {
+    if (!poll) return;
+
+    const expiryDate = new Date(poll.expires_at).getTime();
+    const now = new Date().getTime();
+
+    if (expiryDate < now) {
+      setHasExpired(true);
+    }
+  }, [poll]);
 
   const handleVote = async (optionId: string) => {
     if (!user) return;
@@ -147,6 +159,7 @@ const ViewPoll = () => {
   return (
     <div className="max-w-screen-sm">
       <h3 className="text-2xl font-bold">{poll.question}</h3>
+      <p>Creator: @{poll?.creator_name}</p>
       <p className="font-[family-name:var(--font-geist-mono)] text-sm text-gray-400 mt-4">
         {totalVotes} votes . {countdown}
       </p>
@@ -162,7 +175,7 @@ const ViewPoll = () => {
               <li key={option.id} className="border rounded-md border-gray-200">
                 <button
                   onClick={() => handleVote(option.id)}
-                  disabled={!user || !canVote}
+                  disabled={!user || hasExpired || !canVote}
                   className="w-full text-left p-4 rounded-md hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                   {option.text}
                 </button>
@@ -208,6 +221,11 @@ const ViewPoll = () => {
 
       {user && !canVote && (
         <p className="mt-4 text-gray-600">You cannot vote on your own poll</p>
+      )}
+      {user && hasExpired && (
+        <p className="mt-4 text-gray-600">
+          This poll has expired and no longer accepts votes
+        </p>
       )}
     </div>
   );
