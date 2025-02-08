@@ -72,3 +72,40 @@ export const getCountdown = (expiresAt: string): string => {
     return `${minutes}m left`;
   }
 };
+
+// Create dummy data
+export const dummyData = [
+  {
+    creator_name: "John Doe",
+    created_at: "2021-10-01T12:00:00Z",
+    created_by: "123",
+    expires_at: "2021-10-08T12:00:00Z",
+    id: "1",
+    question: "What's your favorite color?",
+    active: true,
+    options: [
+      {
+        id: "1",
+        text: "Red",
+        votes: [{ count: 5 }],
+      },
+    ],
+  },
+
+  {
+    creator_name: "John Doe",
+    created_at: "2021-10-01T12:00:00Z",
+    created_by: "123",
+    expires_at: "2021-10-08T12:00:00Z",
+    id: "1",
+    question: "What's your favorite color?",
+    active: true,
+    options: [
+      {
+        id: "1",
+        text: "Red",
+        votes: [{ count: 5 }],
+      },
+    ],
+  },
+];

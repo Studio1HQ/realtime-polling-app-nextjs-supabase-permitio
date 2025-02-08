@@ -1,11 +1,7 @@
-import { useRouter } from "next/router";
 import React from "react";
 
 const ManageButton = ({ closeDropdown }: { closeDropdown: () => void }) => {
-  const router = useRouter();
-
   const handleClick = () => {
-    router.push("/polls/manage");
     closeDropdown();
   };
 

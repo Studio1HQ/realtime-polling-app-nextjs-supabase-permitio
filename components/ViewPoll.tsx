@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import { calculateTotalVotes, ViewPollProps, getCountdown } from "@/helpers";
-import { createClient } from "@/utils/supabase/component";
+import {
+  calculateTotalVotes,
+  ViewPollProps,
+  getCountdown,
+  dummyData,
+} from "@/helpers";
 import { User } from "@supabase/supabase-js";
 
 const ViewPoll = () => {
-  const { query } = useRouter();
-  const supabase = createClient();
-
   const [poll, setPoll] = useState<ViewPollProps | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
@@ -17,139 +17,11 @@ const ViewPoll = () => {
   const [hasExpired, setHasExpired] = useState(false);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUser(user);
-    };
-
-    fetchUser();
-  }, [supabase.auth]);
-
-  // Check voting permission using Permit.io
-  useEffect(() => {
-    const checkPermission = async () => {
-      if (!user || !query.id) return;
-
-      try {
-        const response = await fetch(
-          " http://127.0.0.1:54321/functions/v1//checkPermission",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              userId: user.id,
-              operation: "create",
-              key: query.id,
-            }),
-          }
-        );
-
-        const { permitted } = await response.json();
-        setCanVote(permitted);
-      } catch (error) {
-        console.error("Error checking permission:", error);
-        setCanVote(false);
-      }
-    };
-
-    checkPermission();
-  }, [user, query.id]);
-
-  useEffect(() => {
-    if (!user) {
-      return;
-    }
-
-    const checkUserVote = async () => {
-      const { data: votes } = await supabase
-        .from("votes")
-        .select("id")
-        .eq("poll_id", query.id)
-        .eq("user_id", user.id)
-        .single();
-
-      setHasVoted(!!votes);
-      setVoteLoading(false);
-    };
-
-    const fetchPoll = async () => {
-      const { data } = await supabase
-        .from("polls")
-        .select(
-          `
-          *,
-          options (
-            id,
-            text,
-            votes (count)
-          )
-        `
-        )
-        .eq("id", query.id)
-        .single();
-
-      setPoll(data);
-      setPollLoading(false);
-
-      checkUserVote();
-    };
-
-    fetchPoll();
-
-    const channel = supabase
-      .channel(`poll-${query.id}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "votes",
-          filter: `poll_id=eq.${query.id}`,
-        },
-        () => {
-          fetchPoll();
-          checkUserVote();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [query.id, supabase, user]);
-
-  useEffect(() => {
-    if (!poll) return;
-
-    const expiryDate = new Date(poll.expires_at).getTime();
-    const now = new Date().getTime();
-
-    if (expiryDate < now) {
-      setHasExpired(true);
-    }
-  }, [poll]);
-
-  const handleVote = async (optionId: string) => {
-    if (!user) return;
-
-    try {
-      const { error } = await supabase.from("votes").insert({
-        poll_id: query.id,
-        option_id: optionId,
-        user_id: user.id,
-      });
-
-      if (!error) {
-        setHasVoted(true);
-      }
-    } catch (error) {
-      console.error("Error voting:", error);
-    }
-  };
+    // Fetch poll
+    setPollLoading(false);
+    setVoteLoading(false);
+    setPoll(dummyData[0]);
+  }, []);
 
   if (!poll || pollLoading || voteLoading) return <div>Loading...</div>;
 
@@ -174,7 +46,7 @@ const ViewPoll = () => {
             return (
               <li key={option.id} className="border rounded-md border-gray-200">
                 <button
-                  onClick={() => handleVote(option.id)}
+                  onClick={() => console.log(option.id)}
                   disabled={!user || hasExpired || !canVote}
                   className="w-full text-left p-4 rounded-md hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                   {option.text}

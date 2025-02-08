@@ -1,82 +1,22 @@
 import { getCountdown, PollProps } from "@/helpers";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { createClient } from "@/utils/supabase/component";
-import { User } from "@supabase/supabase-js";
 
 const PollCard = ({ poll }: { poll: PollProps }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [canManagePoll, setCanManagePoll] = useState(false);
 
   useEffect(() => {
-    const supabase = createClient();
-    const fetchUser = async () => {
-      const { data } = supabase.auth.onAuthStateChange((event, session) => {
-        setUser(session?.user || null);
-        setLoading(false);
-      });
-
-      return () => {
-        data.subscription.unsubscribe();
-      };
-    };
-
-    fetchUser();
+    setLoading(false);
   }, []);
-
-  // Check if user has permission to manage the poll
-  useEffect(() => {
-    const checkPollPermissions = async () => {
-      if (!user || !poll.id) return;
-
-      try {
-        // Check for both edit and delete permissions
-        const [editResponse, deleteResponse] = await Promise.all([
-          fetch("http://127.0.0.1:54321/functions/v1/checkPermission", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              userId: user.id,
-              operation: "update",
-              key: poll.id,
-            }),
-          }),
-          fetch("/api/checkPermission", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              userId: user.id,
-              operation: "delete",
-              key: poll.id,
-            }),
-          }),
-        ]);
-
-        const [{ permitted: canEdit }, { permitted: canDelete }] =
-          await Promise.all([editResponse.json(), deleteResponse.json()]);
-
-        // User can manage poll if they have either edit or delete permission
-        setCanManagePoll(canEdit || canDelete);
-      } catch (error) {
-        console.error("Error checking permissions:", error);
-        setCanManagePoll(false);
-      }
-    };
-
-    checkPollPermissions();
-  }, [user, poll.id]);
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
   const countdown = getCountdown(poll?.expires_at);
-  const votes = poll?.votes[0]?.count ? poll?.votes[0]?.count : 0;
+  // const votes = poll?.votes[0]?.count ? poll?.votes[0]?.count : 0;
 
   const handleEdit = async (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent Link navigation
@@ -98,7 +38,7 @@ const PollCard = ({ poll }: { poll: PollProps }) => {
       <p>@{poll?.creator_name}</p>
 
       <p className="font-[family-name:var(--font-geist-mono)] text-sm text-gray-400 mt-4">
-        {votes} votes . {countdown}
+        {12} votes . {countdown}
       </p>
 
       {canManagePoll && (

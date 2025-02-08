@@ -1,9 +1,6 @@
 import { useState } from "react";
-import { createClient } from "@/utils/supabase/component";
 
 const LogInButton = () => {
-  const supabase = createClient();
-
   const [showModal, setShowModal] = useState(false);
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
@@ -11,44 +8,9 @@ const LogInButton = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState("");
 
-  async function logIn() {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) {
-      setError(error.message);
-    } else {
-      setShowModal(false);
-    }
-  }
-
-  async function signUp() {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          user_name: userName,
-        },
-      },
-    });
-    if (error) {
-      setError(error.message);
-    } else {
-      setShowModal(false);
-    }
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
-    if (isLogin) {
-      await logIn();
-    } else {
-      await signUp();
-    }
   };
 
   return (
