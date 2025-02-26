@@ -1,40 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Building a Real-Time Polling App with Next.js, Supabase and Permit.io for Audience Participation :writing_hand:
 
-## Getting Started
+This repository contains the demo project for building a real-time polling app using Next.js, Supabase, and Permit.io for role-based access control (RBAC). In this project, unauthenticated users are allowed only to view polls on the platform. Authenticated users can create new polls, vote in them (except for polls they created) and view real-time voting results. Only the creator of a poll is allowed to edit or delete their poll. Check out the full tutorial on [the Permit blog](https://www.permit.io/blog).
 
-First, run the development server:
+<!-- Visit my blog, [Timonwa's Notes](https://tech.timonwa.com/blog), for more awesome technical content such as articles, code snippets, tech goodies, community projects, and more. -->
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+If you find this repository helpful, please give it a ⭐ to show your support!
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Table of Contents
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [Setup and Installation](#setup-and-installation)
+- [License](#license)
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+---
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+## Features
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Role-based access control (RBAC) using Permit.io
+- User authentication with Supabase Email Authentication
+- CRUD actions with different permissions per role
+- Real-time polling updates with Supabase
 
-## Learn More
+## Technologies Used
 
-To learn more about Next.js, take a look at the following resources:
+- **Next.js** – React framework for building full-stack applications
+- **Supabase** – For real-time database and authentication
+- **Permit.io** – Handles permissions and role-based access controls
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Setup and Installation
 
-## Deploy on Vercel
+To run this project locally:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Clone the repository:**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+  ```bash
+  git clone https://github.com/Studio1HQ/realtime-polling-app-nextjs-supabase-permitio.git
+  ```
+
+- **Install dependencies:**
+
+  ```bash
+  cd realtime-polling-app-nextjs-supabase-permitio
+  npm install
+  ```
+
+- **Start the development server:**
+
+  ```bash
+  npm dev
+  ```
+
+---
+
+## License
+
+This project is licensed under the MIT License – see the [LICENSE](https://github.com/Timonwa/react-chat-permitio-firebase/blob/main/LICENSE.MD) file
+for details.
+
+---
+
+### Additional Resources
+
+- [Next.js](https://nextjs.org/)
+- [Supabase Documentation](https://supabase.com/docs)
+- [Permit.io Documentation](https://docs.permit.io)
