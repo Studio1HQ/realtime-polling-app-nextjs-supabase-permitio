@@ -2,7 +2,7 @@
 
 This repository contains the demo project for building a real-time polling app using Next.js, Supabase, and Permit.io for role-based access control (RBAC). In this project, unauthenticated users are allowed only to view polls on the platform. Authenticated users can create new polls, vote in them (except for polls they created) and view real-time voting results. Only the creator of a poll is allowed to edit or delete their poll. Check out the full tutorial on [the Permit blog](https://www.permit.io/blog).
 
-<!-- Visit my blog, [Timonwa's Notes](https://tech.timonwa.com/blog), for more awesome technical content such as articles, code snippets, tech goodies, community projects, and more. -->
+Visit my blog, [Timonwa's Notes](https://tech.timonwa.com/blog), for more awesome technical content such as articles, code snippets, tech goodies, community projects, and more.
 
 If you find this repository helpful, please give it a ⭐ to show your support!
 
